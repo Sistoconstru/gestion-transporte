@@ -970,7 +970,16 @@
         }
 
         function captureDriverReceipt() {
-            navigator.mediaDevices.getUserMedia({ video: true })
+            // Configuración para usar cámara trasera en móviles
+            const videoConstraints = {
+                video: {
+                    facingMode: { ideal: 'environment' }, // 'environment' = cámara trasera
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            };
+            
+            navigator.mediaDevices.getUserMedia(videoConstraints)
                 .then(stream => {
                     const video = document.createElement('video');
                     video.srcObject = stream;
@@ -1023,7 +1032,63 @@
                     };
                 })
                 .catch(err => {
-                    alert('Error al acceder a la cámara: ' + err.message);
+                    // Si falla con cámara trasera, intentar con la frontal como respaldo
+                    console.log('Cámara trasera no disponible, usando cámara frontal...');
+                    navigator.mediaDevices.getUserMedia({ video: true })
+                        .then(fallbackStream => {
+                            const video = document.createElement('video');
+                            video.srcObject = fallbackStream;
+                            video.play();
+                            
+                            const modal = document.createElement('div');
+                            modal.style.cssText = `
+                                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                                background: rgba(0,0,0,0.8); z-index: 1000;
+                                display: flex; flex-direction: column; align-items: center; justify-content: center;
+                            `;
+                            
+                            video.style.cssText = 'max-width: 90%; max-height: 70%; border-radius: 10px;';
+                            
+                            const captureBtn = document.createElement('button');
+                            captureBtn.textContent = '📷 Capturar (Cámara Frontal)';
+                            captureBtn.className = 'btn camera-btn';
+                            captureBtn.style.marginTop = '20px';
+                            
+                            const closeBtn = document.createElement('button');
+                            closeBtn.textContent = '❌ Cerrar';
+                            closeBtn.className = 'btn btn-danger';
+                            closeBtn.style.marginTop = '10px';
+                            
+                            modal.appendChild(video);
+                            modal.appendChild(captureBtn);
+                            modal.appendChild(closeBtn);
+                            document.body.appendChild(modal);
+                            
+                            captureBtn.onclick = () => {
+                                const canvas = document.createElement('canvas');
+                                canvas.width = video.videoWidth;
+                                canvas.height = video.videoHeight;
+                                canvas.getContext('2d').drawImage(video, 0, 0);
+                                
+                                const receiptId = Date.now();
+                                receipts[receiptId] = canvas.toDataURL();
+                                currentDriverReceiptId = receiptId;
+                                saveDataToStorage();
+                                
+                                displayDriverReceiptPreview(receipts[receiptId]);
+                                
+                                fallbackStream.getTracks().forEach(track => track.stop());
+                                document.body.removeChild(modal);
+                            };
+                            
+                            closeBtn.onclick = () => {
+                                fallbackStream.getTracks().forEach(track => track.stop());
+                                document.body.removeChild(modal);
+                            };
+                        })
+                        .catch(finalErr => {
+                            alert('Error al acceder a la cámara: ' + finalErr.message);
+                        });
                 });
         }
 
@@ -1050,7 +1115,16 @@
         }
 
         function captureReceipt() {
-            navigator.mediaDevices.getUserMedia({ video: true })
+            // Configuración para usar cámara trasera en móviles
+            const videoConstraints = {
+                video: {
+                    facingMode: { ideal: 'environment' }, // 'environment' = cámara trasera
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            };
+            
+            navigator.mediaDevices.getUserMedia(videoConstraints)
                 .then(stream => {
                     const video = document.createElement('video');
                     video.srcObject = stream;
@@ -1103,7 +1177,63 @@
                     };
                 })
                 .catch(err => {
-                    alert('Error al acceder a la cámara: ' + err.message);
+                    // Si falla con cámara trasera, intentar con la frontal como respaldo
+                    console.log('Cámara trasera no disponible, usando cámara frontal...');
+                    navigator.mediaDevices.getUserMedia({ video: true })
+                        .then(fallbackStream => {
+                            const video = document.createElement('video');
+                            video.srcObject = fallbackStream;
+                            video.play();
+                            
+                            const modal = document.createElement('div');
+                            modal.style.cssText = `
+                                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                                background: rgba(0,0,0,0.8); z-index: 1000;
+                                display: flex; flex-direction: column; align-items: center; justify-content: center;
+                            `;
+                            
+                            video.style.cssText = 'max-width: 90%; max-height: 70%; border-radius: 10px;';
+                            
+                            const captureBtn = document.createElement('button');
+                            captureBtn.textContent = '📷 Capturar (Cámara Frontal)';
+                            captureBtn.className = 'btn camera-btn';
+                            captureBtn.style.marginTop = '20px';
+                            
+                            const closeBtn = document.createElement('button');
+                            closeBtn.textContent = '❌ Cerrar';
+                            closeBtn.className = 'btn btn-danger';
+                            closeBtn.style.marginTop = '10px';
+                            
+                            modal.appendChild(video);
+                            modal.appendChild(captureBtn);
+                            modal.appendChild(closeBtn);
+                            document.body.appendChild(modal);
+                            
+                            captureBtn.onclick = () => {
+                                const canvas = document.createElement('canvas');
+                                canvas.width = video.videoWidth;
+                                canvas.height = video.videoHeight;
+                                canvas.getContext('2d').drawImage(video, 0, 0);
+                                
+                                const receiptId = Date.now();
+                                receipts[receiptId] = canvas.toDataURL();
+                                currentReceiptId = receiptId;
+                                saveDataToStorage();
+                                
+                                displayReceiptPreview(receipts[receiptId]);
+                                
+                                fallbackStream.getTracks().forEach(track => track.stop());
+                                document.body.removeChild(modal);
+                            };
+                            
+                            closeBtn.onclick = () => {
+                                fallbackStream.getTracks().forEach(track => track.stop());
+                                document.body.removeChild(modal);
+                            };
+                        })
+                        .catch(finalErr => {
+                            alert('Error al acceder a la cámara: ' + finalErr.message);
+                        });
                 });
         }
 
