@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Gestión de Gastos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        input[type="text"], input[type="password"], select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        .error-message {
+            background: #ff6b6b;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .demo-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #4facfe;
+        }
+
+        .demo-info h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .demo-credentials {
+            text-align: left;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .demo-credentials strong {
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">🚛</div>
+        <h1>Sistema de Gestión</h1>
+        
+        <div id="errorMessage" class="error-message"></div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="userType">Tipo de Usuario:</label>
+                <select id="userType" required>
+                    <option value="">Seleccionar tipo</option>
+                    <option value="admin">Administrador</option>
+                    <option value="driver">Conductor</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="username">Usuario:</label>
+                <input type="text" id="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" required>
+            </div>
+            
+            <button type="submit" class="btn">Iniciar Sesión</button>
+        </form>
+
+        <div class="demo-info">
+            <h3>Credenciales de Prueba</h3>
+            <div class="demo-credentials">
+                <p><strong>Administrador:</strong><br>
+                Usuario: admin<br>
+                Contraseña: admin123</p>
+                
+                <p style="margin-top: 10px;"><strong>Conductor:</strong><br>
+                Usuario: conductor1<br>
+                Contraseña: pass123</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para obtener usuarios del sistema
+        function getStoredUsers() {
+            const storedUsers = localStorage.getItem('systemUsers');
+            return storedUsers ? JSON.parse(storedUsers) : getDefaultUsers();
+        }
+
+        function getDefaultUsers() {
+            return {
+                admin: {
+                    password: 'admin123',
+                    type: 'admin',
+                    name: 'Administrador',
+                    id: 'admin'
+                },
+                conductor1: {
+                    password: 'pass123',
+                    type: 'driver',
+                    name: 'Juan Pérez',
+                    id: 'conductor1',
+                    driverId: 1
+                },
+                conductor2: {
+                    password: 'pass123',
+                    type: 'driver', 
+                    name: 'María González',
+                    id: 'conductor2',
+                    driverId: 2
+                }
+            };
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const userType = document.getElementById('userType').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const errorDiv = document.getElementById('errorMessage');
+            
+            // Validar campos
+            if (!userType || !username || !password) {
+                showError('Por favor complete todos los campos');
+                return;
+            }
+            
+            // Obtener usuarios del sistema (dinámicos)
+            const users = getStoredUsers();
+            
+            // Verificar usuario
+            const user = users[username];
+            if (!user) {
+                showError('Usuario no encontrado');
+                return;
+            }
+            
+            // Verificar contraseña
+            if (user.password !== password) {
+                showError('Contraseña incorrecta');
+                return;
+            }
+            
+            // Verificar tipo de usuario
+            if (user.type !== userType) {
+                showError('Tipo de usuario incorrecto');
+                return;
+            }
+            
+            // Login exitoso
+            const sessionData = {
+                username: username,
+                name: user.name,
+                type: user.type,
+                id: user.id,
+                driverId: user.driverId || null,
+                loginTime: new Date().toISOString()
+            };
+            
+            // Guardar sesión
+            sessionStorage.setItem('userSession', JSON.stringify(sessionData));
+            
+            // Redirigir a la aplicación principal
+            window.location.href = 'admin_vehiculos.html';
+        });
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Verificar si ya hay una sesión activa
+        window.addEventListener('load', function() {
+            const session = sessionStorage.getItem('userSession');
+            if (session) {
+                window.location.href = 'admin_vehiculos.html';
+            }
+        });
+    </script>
+</body>
+</html>

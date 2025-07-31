@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Gastos - Vehículos de Carga</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .tab-btn {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .content-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .photo-container {
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .photo-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .expense-item {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+        }
+
+        .expense-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .expense-amount {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .camera-btn {
+            background: linear-gradient(45deg, #2ecc71 0%, #27ae60 100%);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .tab-btn {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚛 Sistema de Gestión de Gastos</h1>
+            <p style="text-align: center; color: #7f8c8d;">Vehículos de Carga</p>
+            
+            <!-- Información del usuario logueado -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e9ecef;">
+                <div>
+                    <span id="userInfo" style="color: #2c3e50; font-weight: 600;"></span>
+                </div>
+                <button class="btn btn-danger" onclick="logout()" style="padding: 8px 16px; font-size: 14px;">🚪 Cerrar Sesión</button>
+            </div>
+            
+            <div class="nav-tabs">
+                <button class="tab-btn active" onclick="showSection('dashboard')">📊 Dashboard</button>
+                <button class="tab-btn" onclick="showSection('vehicles')">🚛 Vehículos</button>
+                <button class="tab-btn" onclick="showSection('drivers')">👨‍💼 Conductores</button>
+                <button class="tab-btn" onclick="showSection('expenses')">💰 Gastos</button>
+                <button class="tab-btn" onclick="showSection('reports')">📈 Reportes</button>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="content-section active">
+            <h2>📊 Dashboard General</h2>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalVehicles">0</div>
+                    <div>Vehículos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalDrivers">0</div>
+                    <div>Conductores</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalExpenses">$0</div>
+                    <div>Gastos del Mes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalReceipts">0</div>
+                    <div>Recibos</div>
+                </div>
+            </div>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>Gastos Recientes</h3>
+                    <div id="recentExpenses"></div>
+                </div>
+                <div class="card">
+                    <h3>Resumen por Vehículo</h3>
+                    <div id="vehicleSummary"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehículos -->
+        <div id="vehicles" class="content-section">
+            <h2>🚛 Gestión de Vehículos</h2>
+            
+            <div class="card">
+                <h3>Registrar Nuevo Vehículo</h3>
+                <form id="vehicleForm">
+                    <div class="form-group">
+                        <label>Placa:</label>
+                        <input type="text" id="vehiclePlate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Marca:</label>
+                        <input type="text" id="vehicleBrand" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Modelo:</label>
+                        <input type="text" id="vehicleModel" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Año:</label>
+                        <input type="number" id="vehicleYear" required>
+                    </div>
+                    <button type="submit" class="btn">Guardar Vehículo</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3>Vehículos Registrados</h3>
+                <div id="vehiclesList"></div>
+            </div>
+        </div>
+
+        <!-- Conductores -->
+        <div id="drivers" class="content-section">
+            <h2>👨‍💼 Gestión de Conductores</h2>
+            
+            <div class="card">
+                <h3>Registrar Nuevo Conductor</h3>
+                <form id="driverForm">
+                    <div class="form-group">
+                        <label>Nombre Completo:</label>
+                        <input type="text" id="driverName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Cédula:</label>
+                        <input type="text" id="driverID" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono:</label>
+                        <input type="text" id="driverPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Vehículo Asignado:</label>
+                        <select id="driverVehicle" required>
+                            <option value="">Seleccionar vehículo</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Credenciales de acceso -->
+                    <div style="border-top: 2px solid #e9ecef; margin: 20px 0; padding-top: 20px;">
+                        <h4 style="color: #2c3e50; margin-bottom: 15px;">🔐 Credenciales de Acceso</h4>
+                        <div class="form-group">
+                            <label>Usuario de Login:</label>
+                            <input type="text" id="driverUsername" required placeholder="Ej: conductor_juan">
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña:</label>
+                            <input type="password" id="driverPassword" required minlength="6" placeholder="Mínimo 6 caracteres">
+                        </div>
+                        <div class="form-group">
+                            <label>Confirmar Contraseña:</label>
+                            <input type="password" id="driverPasswordConfirm" required minlength="6" placeholder="Repetir contraseña">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn">Guardar Conductor</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3>Conductores Registrados</h3>
+                <div id="driversList"></div>
+            </div>
+        </div>
+
+        <!-- Gastos -->
+        <div id="expenses" class="content-section">
+            <h2>💰 Registro de Gastos</h2>
+            
+            <div class="card">
+                <h3>Nuevo Gasto</h3>
+                <form id="expenseForm">
+                    <div class="form-group">
+                        <label>Conductor:</label>
+                        <select id="expenseDriver" required>
+                            <option value="">Seleccionar conductor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Vehículo:</label>
+                        <select id="expenseVehicle" required>
+                            <option value="">Seleccionar vehículo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Gasto:</label>
+                        <select id="expenseType" required>
+                            <option value="">Seleccionar tipo</option>
+                            <option value="combustible">Combustible</option>
+                            <option value="peajes">Peajes</option>
+                            <option value="aceite">Aceite</option>
+                            <option value="repuestos">Repuestos</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Monto ($):</label>
+                        <input type="number" id="expenseAmount" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción:</label>
+                        <textarea id="expenseDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha:</label>
+                        <input type="date" id="expenseDate" required>
+                    </div>
+                    
+                    <div class="photo-container">
+                        <button type="button" class="btn camera-btn" onclick="captureReceipt()">📷 Tomar Foto del Recibo</button>
+                        <input type="file" id="receiptFile" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+                        <button type="button" class="btn" onclick="document.getElementById('receiptFile').click()">📁 Subir Imagen</button>
+                        <div id="receiptPreview"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn">Guardar Gasto</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3>Gastos Registrados</h3>
+                <div class="form-group">
+                    <label>Filtrar por:</label>
+                    <select id="expenseFilter" onchange="filterExpenses()">
+                        <option value="all">Todos</option>
+                        <option value="today">Hoy</option>
+                        <option value="week">Esta Semana</option>
+                        <option value="month">Este Mes</option>
+                    </select>
+                </div>
+                <div id="expensesList"></div>
+            </div>
+        </div>
+
+        <!-- Reportes -->
+        <div id="reports" class="content-section">
+            <h2>📈 Reportes</h2>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>Gastos por Vehículo</h3>
+                    <div id="vehicleReport"></div>
+                </div>
+                <div class="card">
+                    <h3>Gastos por Conductor</h3>
+                    <div id="driverReport"></div>
+                </div>
+                <div class="card">
+                    <h3>Gastos por Categoría</h3>
+                    <div id="categoryReport"></div>
+                </div>
+                <div class="card">
+                    <h3>Exportar Datos</h3>
+                    <button class="btn" onclick="exportData()">📥 Descargar Datos (JSON)</button>
+                    <button class="btn" onclick="importData()">📤 Importar Datos</button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="handleImport(event)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sistema de autenticación y sesiones
+        let currentUser = null;
+        
+        // Datos en memoria (en producción usar localStorage)
+        let vehicles = [];
+        let drivers = [];
+        let expenses = [];
+        let receipts = {};
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar autenticación
+            checkAuthentication();
+            
+            // Cargar datos de ejemplo si es necesario
+            loadSampleData();
+            
+            updateDashboard();
+            updateAllLists();
+            
+            // Configurar fecha actual por defecto
+            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+        });
+
+        function checkAuthentication() {
+            const session = sessionStorage.getItem('userSession');
+            
+            if (!session) {
+                // No hay sesión, redirigir al login
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            currentUser = JSON.parse(session);
+            
+            // Mostrar información del usuario
+            document.getElementById('userInfo').textContent = 
+                `👤 ${currentUser.name} (${currentUser.type === 'admin' ? 'Administrador' : 'Conductor'})`;
+            
+            // Configurar interfaz según el rol
+            setupUserInterface();
+        }
+
+        function setupUserInterface() {
+            const navTabs = document.querySelector('.nav-tabs');
+            const sections = document.querySelectorAll('.content-section');
+            
+            if (currentUser.type === 'driver') {
+                // Para conductores: solo mostrar dashboard personal y gastos
+                navTabs.innerHTML = `
+                    <button class="tab-btn active" onclick="showSection('dashboard')">📊 Mi Dashboard</button>
+                    <button class="tab-btn" onclick="showSection('expenses')">💰 Mis Gastos</button>
+                `;
+                
+                // Ocultar secciones de administrador
+                document.getElementById('vehicles').style.display = 'none';
+                document.getElementById('drivers').style.display = 'none';
+                document.getElementById('reports').style.display = 'none';
+                
+                // Modificar la sección de gastos para conductores
+                setupDriverExpenseSection();
+            }
+        }
+
+        function setupDriverExpenseSection() {
+            // Para conductores: reemplazar completamente el formulario de gastos
+            const expenseSection = document.getElementById('expenses');
+            if (expenseSection) {
+                expenseSection.innerHTML = `
+                    <h2>💰 Gestión de Mis Gastos</h2>
+                    
+                    <div class="card">
+                        <h3>Registrar Nuevo Gasto</h3>
+                        <form id="driverExpenseForm">
+                            <div class="form-group">
+                                <label>Tipo de Gasto:</label>
+                                <select id="driverExpenseType" required>
+                                    <option value="">Seleccionar tipo</option>
+                                    <option value="combustible">Combustible</option>
+                                    <option value="peajes">Peajes</option>
+                                    <option value="aceite">Aceite</option>
+                                    <option value="repuestos">Repuestos</option>
+                                    <option value="mantenimiento">Mantenimiento</option>
+                                    <option value="otros">Otros</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Monto ($):</label>
+                                <input type="number" id="driverExpenseAmount" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Descripción:</label>
+                                <textarea id="driverExpenseDescription" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha:</label>
+                                <input type="date" id="driverExpenseDate" required>
+                            </div>
+                            
+                            <div class="photo-container">
+                                <button type="button" class="btn camera-btn" onclick="captureDriverReceipt()">📷 Tomar Foto del Recibo</button>
+                                <input type="file" id="driverReceiptFile" accept="image/*" style="display: none;" onchange="handleDriverFileSelect(event)">
+                                <button type="button" class="btn" onclick="document.getElementById('driverReceiptFile').click()">📁 Subir Imagen</button>
+                                <div id="driverReceiptPreview"></div>
+                            </div>
+                            
+                            <button type="submit" class="btn">Guardar Gasto</button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h3>Mis Gastos Registrados</h3>
+                        <div class="form-group">
+                            <label>Filtrar por:</label>
+                            <select id="expenseFilter" onchange="filterExpenses()">
+                                <option value="all">Todos</option>
+                                <option value="today">Hoy</option>
+                                <option value="week">Esta Semana</option>
+                                <option value="month">Este Mes</option>
+                            </select>
+                        </div>
+                        <div id="expensesList"></div>
+                    </div>
+                `;
+                
+                // Configurar fecha actual por defecto
+                setTimeout(() => {
+                    const dateInput = document.getElementById('driverExpenseDate');
+                    if (dateInput) {
+                        dateInput.value = new Date().toISOString().split('T')[0];
+                    }
+                    
+                    // Agregar event listener para el formulario del conductor
+                    const form = document.getElementById('driverExpenseForm');
+                    if (form) {
+                        form.addEventListener('submit', handleDriverExpenseSubmit);
+                    }
+                }, 100);
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('userSession');
+            window.location.href = 'login.html';
+        }
+
+        // Gestión de usuarios y credenciales
+        function getStoredUsers() {
+            const storedUsers = localStorage.getItem('systemUsers');
+            return storedUsers ? JSON.parse(storedUsers) : getDefaultUsers();
+        }
+
+        function getDefaultUsers() {
+            return {
+                admin: {
+                    password: 'admin123',
+                    type: 'admin',
+                    name: 'Administrador',
+                    id: 'admin'
+                },
+                conductor1: {
+                    password: 'pass123',
+                    type: 'driver',
+                    name: 'Juan Pérez',
+                    id: 'conductor1',
+                    driverId: 1
+                },
+                conductor2: {
+                    password: 'pass123',
+                    type: 'driver', 
+                    name: 'María González',
+                    id: 'conductor2',
+                    driverId: 2
+                }
+            };
+        }
+
+        function saveUser(username, userData) {
+            const users = getStoredUsers();
+            users[username] = userData;
+            localStorage.setItem('systemUsers', JSON.stringify(users));
+        }
+
+        // Funciones para persistencia de datos
+        function saveDataToStorage() {
+            localStorage.setItem('vehicles', JSON.stringify(vehicles));
+            localStorage.setItem('drivers', JSON.stringify(drivers));
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            localStorage.setItem('receipts', JSON.stringify(receipts));
+        }
+
+        function loadDataFromStorage() {
+            const savedVehicles = localStorage.getItem('vehicles');
+            const savedDrivers = localStorage.getItem('drivers');
+            const savedExpenses = localStorage.getItem('expenses');
+            const savedReceipts = localStorage.getItem('receipts');
+
+            if (savedVehicles) {
+                vehicles = JSON.parse(savedVehicles);
+            }
+            if (savedDrivers) {
+                drivers = JSON.parse(savedDrivers);
+            }
+            if (savedExpenses) {
+                expenses = JSON.parse(savedExpenses);
+            }
+            if (savedReceipts) {
+                receipts = JSON.parse(savedReceipts);
+            }
+        }
+
+        function loadSampleData() {
+            // Cargar datos desde localStorage primero
+            loadDataFromStorage();
+            
+            // Solo cargar datos de ejemplo si no existen datos guardados y es administrador
+            if (currentUser.type === 'admin' && vehicles.length === 0) {
+                // Datos de ejemplo para demostración
+                vehicles = [
+                    { id: 1, plate: 'ABC-123', brand: 'Volvo', model: 'FH', year: 2020 },
+                    { id: 2, plate: 'DEF-456', brand: 'Scania', model: 'R500', year: 2019 }
+                ];
+                
+                drivers = [
+                    { id: 1, name: 'Juan Pérez', idNumber: '12345678', phone: '555-0001', vehicleId: 1, username: 'conductor1' },
+                    { id: 2, name: 'María González', idNumber: '87654321', phone: '555-0002', vehicleId: 2, username: 'conductor2' }
+                ];
+                
+                expenses = [
+                    { 
+                        id: 1, 
+                        driverId: 1, 
+                        vehicleId: 1, 
+                        type: 'combustible', 
+                        amount: 150000, 
+                        description: 'Tanque lleno',
+                        date: new Date().toISOString().split('T')[0],
+                        receiptId: null 
+                    },
+                    { 
+                        id: 2, 
+                        driverId: 2, 
+                        vehicleId: 2, 
+                        type: 'peajes', 
+                        amount: 25000, 
+                        description: 'Peajes ruta nacional',
+                        date: new Date().toISOString().split('T')[0],
+                        receiptId: null 
+                    }
+                ];
+                
+                // Guardar datos de ejemplo
+                saveDataToStorage();
+            }
+        }
+
+        
+
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Mostrar sección seleccionada
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Actualizar botones
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Gestión de Vehículos
+        document.getElementById('vehicleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const vehicle = {
+                id: Date.now(),
+                plate: document.getElementById('vehiclePlate').value,
+                brand: document.getElementById('vehicleBrand').value,
+                model: document.getElementById('vehicleModel').value,
+                year: parseInt(document.getElementById('vehicleYear').value)
+            };
+            
+            vehicles.push(vehicle);
+            saveDataToStorage(); // Guardar en localStorage
+            updateVehiclesList();
+            updateVehicleSelects();
+            updateDashboard();
+            this.reset();
+            alert('Vehículo registrado exitosamente');
+        });
+
+        function updateVehiclesList() {
+            const container = document.getElementById('vehiclesList');
+            container.innerHTML = vehicles.map(vehicle => `
+                <div class="expense-item">
+                    <div class="expense-header">
+                        <strong>${vehicle.plate} - ${vehicle.brand} ${vehicle.model}</strong>
+                        <button class="btn btn-danger" onclick="deleteVehicle(${vehicle.id})">Eliminar</button>
+                    </div>
+                    <p>Año: ${vehicle.year}</p>
+                </div>
+            `).join('');
+        }
+
+        function deleteVehicle(id) {
+            if (confirm('¿Está seguro de eliminar este vehículo?')) {
+                vehicles = vehicles.filter(v => v.id !== id);
+                saveDataToStorage(); // Guardar en localStorage
+                updateVehiclesList();
+                updateVehicleSelects();
+                updateDashboard();
+            }
+        }
+
+        function updateVehicleSelects() {
+            const selects = ['driverVehicle', 'expenseVehicle'];
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">Seleccionar vehículo</option>' +
+                    vehicles.map(v => `<option value="${v.id}">${v.plate} - ${v.brand} ${v.model}</option>`).join('');
+                select.value = currentValue;
+            });
+        }
+
+        // Gestión de Conductores
+        document.getElementById('driverForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validar credenciales
+            const username = document.getElementById('driverUsername').value;
+            const password = document.getElementById('driverPassword').value;
+            const passwordConfirm = document.getElementById('driverPasswordConfirm').value;
+            
+            // Verificar que las contraseñas coincidan
+            if (password !== passwordConfirm) {
+                alert('Las contraseñas no coinciden');
+                return;
+            }
+            
+            // Verificar que el username no exista
+            const existingUsers = getStoredUsers();
+            if (existingUsers[username]) {
+                alert('El nombre de usuario ya existe. Por favor elige otro.');
+                return;
+            }
+            
+            const driverId = Date.now();
+            const driver = {
+                id: driverId,
+                name: document.getElementById('driverName').value,
+                idNumber: document.getElementById('driverID').value,
+                phone: document.getElementById('driverPhone').value,
+                vehicleId: parseInt(document.getElementById('driverVehicle').value),
+                username: username
+            };
+            
+            // Crear credenciales del usuario
+            const newUser = {
+                password: password,
+                type: 'driver',
+                name: driver.name,
+                id: username,
+                driverId: driverId
+            };
+            
+            // Guardar usuario
+            saveUser(username, newUser);
+            
+            drivers.push(driver);
+            saveDataToStorage(); // Guardar en localStorage
+            updateDriversList();
+            updateDriverSelects();
+            updateDashboard();
+            this.reset();
+            alert(`Conductor registrado exitosamente.\n\nCredenciales creadas:\nUsuario: ${username}\nContraseña: ${password}\n\nPor favor, guarda esta información para entregar al conductor.`);
+        });
+
+        function updateDriversList() {
+            const container = document.getElementById('driversList');
+            container.innerHTML = drivers.map(driver => {
+                const vehicle = vehicles.find(v => v.id === driver.vehicleId);
+                return `
+                    <div class="expense-item">
+                        <div class="expense-header">
+                            <strong>${driver.name}</strong>
+                            <button class="btn btn-danger" onclick="deleteDriver(${driver.id})">Eliminar</button>
+                        </div>
+                        <p>Cédula: ${driver.idNumber} | Teléfono: ${driver.phone}</p>
+                        <p>Vehículo: ${vehicle ? vehicle.plate : 'No asignado'}</p>
+                        ${driver.username ? `<p><strong>👤 Usuario:</strong> ${driver.username}</p>` : '<p style="color: #e74c3c;"><em>Sin credenciales asignadas</em></p>'}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function deleteDriver(id) {
+            if (confirm('¿Está seguro de eliminar este conductor? Esto también eliminará sus credenciales de acceso.')) {
+                // Encontrar el conductor para obtener su username
+                const driver = drivers.find(d => d.id === id);
+                
+                // Eliminar credenciales si existe username
+                if (driver && driver.username) {
+                    const users = getStoredUsers();
+                    delete users[driver.username];
+                    localStorage.setItem('systemUsers', JSON.stringify(users));
+                }
+                
+                // Eliminar conductor
+                drivers = drivers.filter(d => d.id !== id);
+                saveDataToStorage(); // Guardar en localStorage
+                updateDriversList();
+                updateDriverSelects();
+                updateDashboard();
+                
+                alert('Conductor y sus credenciales eliminados exitosamente');
+            }
+        }
+
+        function updateDriverSelects() {
+            const select = document.getElementById('expenseDriver');
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">Seleccionar conductor</option>' +
+                drivers.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+            select.value = currentValue;
+        }
+
+        // Gestión de Gastos
+        document.getElementById('expenseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const expense = {
+                id: Date.now(),
+                driverId: parseInt(document.getElementById('expenseDriver').value),
+                vehicleId: parseInt(document.getElementById('expenseVehicle').value),
+                type: document.getElementById('expenseType').value,
+                amount: parseFloat(document.getElementById('expenseAmount').value),
+                description: document.getElementById('expenseDescription').value,
+                date: document.getElementById('expenseDate').value,
+                receiptId: currentReceiptId || null
+            };
+            
+            expenses.push(expense);
+            currentReceiptId = null;
+            saveDataToStorage(); // Guardar en localStorage
+            updateExpensesList();
+            updateDashboard();
+            updateReports();
+            this.reset();
+            document.getElementById('receiptPreview').innerHTML = '';
+            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+            alert('Gasto registrado exitosamente');
+        });
+
+        let currentReceiptId = null;
+        let currentDriverReceiptId = null;
+
+        // Manejo de gastos para conductores
+        function handleDriverExpenseSubmit(e) {
+            e.preventDefault();
+            
+            // Obtener información del conductor y su vehículo
+            const driver = drivers.find(d => d.id === currentUser.driverId);
+            if (!driver) {
+                alert('Error: No se encontró información del conductor');
+                return;
+            }
+            
+            const expense = {
+                id: Date.now(),
+                driverId: currentUser.driverId,
+                vehicleId: driver.vehicleId,
+                type: document.getElementById('driverExpenseType').value,
+                amount: parseFloat(document.getElementById('driverExpenseAmount').value),
+                description: document.getElementById('driverExpenseDescription').value,
+                date: document.getElementById('driverExpenseDate').value,
+                receiptId: currentDriverReceiptId || null
+            };
+            
+            expenses.push(expense);
+            currentDriverReceiptId = null;
+            saveDataToStorage(); // Guardar en localStorage
+            updateExpensesList();
+            updateDashboard();
+            updateReports();
+            
+            // Limpiar formulario
+            document.getElementById('driverExpenseForm').reset();
+            document.getElementById('driverReceiptPreview').innerHTML = '';
+            document.getElementById('driverExpenseDate').value = new Date().toISOString().split('T')[0];
+            alert('Gasto registrado exitosamente');
+        }
+
+        function captureDriverReceipt() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.play();
+                    
+                    const modal = document.createElement('div');
+                    modal.style.cssText = `
+                        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                        background: rgba(0,0,0,0.8); z-index: 1000;
+                        display: flex; flex-direction: column; align-items: center; justify-content: center;
+                    `;
+                    
+                    video.style.cssText = 'max-width: 90%; max-height: 70%; border-radius: 10px;';
+                    
+                    const captureBtn = document.createElement('button');
+                    captureBtn.textContent = '📷 Capturar';
+                    captureBtn.className = 'btn camera-btn';
+                    captureBtn.style.marginTop = '20px';
+                    
+                    const closeBtn = document.createElement('button');
+                    closeBtn.textContent = '❌ Cerrar';
+                    closeBtn.className = 'btn btn-danger';
+                    closeBtn.style.marginTop = '10px';
+                    
+                    modal.appendChild(video);
+                    modal.appendChild(captureBtn);
+                    modal.appendChild(closeBtn);
+                    document.body.appendChild(modal);
+                    
+                    captureBtn.onclick = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        canvas.getContext('2d').drawImage(video, 0, 0);
+                        
+                        const receiptId = Date.now();
+                        receipts[receiptId] = canvas.toDataURL();
+                        currentDriverReceiptId = receiptId;
+                        saveDataToStorage(); // Guardar recibos
+                        
+                        displayDriverReceiptPreview(receipts[receiptId]);
+                        
+                        stream.getTracks().forEach(track => track.stop());
+                        document.body.removeChild(modal);
+                    };
+                    
+                    closeBtn.onclick = () => {
+                        stream.getTracks().forEach(track => track.stop());
+                        document.body.removeChild(modal);
+                    };
+                })
+                .catch(err => {
+                    alert('Error al acceder a la cámara: ' + err.message);
+                });
+        }
+
+        function handleDriverFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const receiptId = Date.now();
+                    receipts[receiptId] = e.target.result;
+                    currentDriverReceiptId = receiptId;
+                    saveDataToStorage(); // Guardar recibos
+                    displayDriverReceiptPreview(receipts[receiptId]);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function displayDriverReceiptPreview(imageData) {
+            document.getElementById('driverReceiptPreview').innerHTML = `
+                <p>✅ Recibo capturado</p>
+                <img src="${imageData}" class="photo-preview" alt="Recibo">
+            `;
+        }
+
+        function captureReceipt() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.play();
+                    
+                    const modal = document.createElement('div');
+                    modal.style.cssText = `
+                        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                        background: rgba(0,0,0,0.8); z-index: 1000;
+                        display: flex; flex-direction: column; align-items: center; justify-content: center;
+                    `;
+                    
+                    video.style.cssText = 'max-width: 90%; max-height: 70%; border-radius: 10px;';
+                    
+                    const captureBtn = document.createElement('button');
+                    captureBtn.textContent = '📷 Capturar';
+                    captureBtn.className = 'btn camera-btn';
+                    captureBtn.style.marginTop = '20px';
+                    
+                    const closeBtn = document.createElement('button');
+                    closeBtn.textContent = '❌ Cerrar';
+                    closeBtn.className = 'btn btn-danger';
+                    closeBtn.style.marginTop = '10px';
+                    
+                    modal.appendChild(video);
+                    modal.appendChild(captureBtn);
+                    modal.appendChild(closeBtn);
+                    document.body.appendChild(modal);
+                    
+                    captureBtn.onclick = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        canvas.getContext('2d').drawImage(video, 0, 0);
+                        
+                        const receiptId = Date.now();
+                        receipts[receiptId] = canvas.toDataURL();
+                        currentReceiptId = receiptId;
+                        saveDataToStorage(); // Guardar recibos
+                        
+                        displayReceiptPreview(receipts[receiptId]);
+                        
+                        stream.getTracks().forEach(track => track.stop());
+                        document.body.removeChild(modal);
+                    };
+                    
+                    closeBtn.onclick = () => {
+                        stream.getTracks().forEach(track => track.stop());
+                        document.body.removeChild(modal);
+                    };
+                })
+                .catch(err => {
+                    alert('Error al acceder a la cámara: ' + err.message);
+                });
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const receiptId = Date.now();
+                    receipts[receiptId] = e.target.result;
+                    currentReceiptId = receiptId;
+                    saveDataToStorage(); // Guardar recibos
+                    displayReceiptPreview(receipts[receiptId]);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function displayReceiptPreview(imageData) {
+            document.getElementById('receiptPreview').innerHTML = `
+                <p>✅ Recibo capturado</p>
+                <img src="${imageData}" class="photo-preview" alt="Recibo">
+            `;
+        }
+
+        function updateExpensesList() {
+            const container = document.getElementById('expensesList');
+            const filteredExpenses = getFilteredExpenses();
+            
+            container.innerHTML = filteredExpenses.map(expense => {
+                const driver = drivers.find(d => d.id === expense.driverId);
+                const vehicle = vehicles.find(v => v.id === expense.vehicleId);
+                
+                const showDriverInfo = currentUser.type === 'admin';
+                const canDelete = currentUser.type === 'admin';
+                
+                return `
+                    <div class="expense-item">
+                        <div class="expense-header">
+                            <div>
+                                <strong>${expense.type.toUpperCase()}</strong>
+                                ${showDriverInfo ? `<p>${driver?.name || 'N/A'} - ${vehicle?.plate || 'N/A'}</p>` : `<p>${vehicle?.plate || 'N/A'}</p>`}
+                            </div>
+                            <div class="expense-amount">$${expense.amount.toLocaleString()}</div>
+                        </div>
+                        <p>${expense.description}</p>
+                        <p><small>📅 ${expense.date}</small></p>
+                        ${expense.receiptId ? '<p><small>📷 Con recibo</small></p>' : ''}
+                        ${canDelete ? `<button class="btn btn-danger" onclick="deleteExpense(${expense.id})">Eliminar</button>` : ''}
+                        ${expense.receiptId ? `<button class="btn" onclick="viewReceipt(${expense.receiptId})">Ver Recibo</button>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterExpenses() {
+            updateExpensesList();
+        }
+
+        function getFilteredExpenses() {
+            const filter = document.getElementById('expenseFilter').value;
+            const today = new Date();
+            
+            let filteredExpenses = expenses;
+            
+            // Filtrar por usuario si es conductor
+            if (currentUser.type === 'driver') {
+                filteredExpenses = expenses.filter(e => e.driverId === currentUser.driverId);
+            }
+            
+            return filteredExpenses.filter(expense => {
+                const expenseDate = new Date(expense.date);
+                
+                switch(filter) {
+                    case 'today':
+                        return expenseDate.toDateString() === today.toDateString();
+                    case 'week':
+                        const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        return expenseDate >= weekAgo;
+                    case 'month':
+                        return expenseDate.getMonth() === today.getMonth() && 
+                               expenseDate.getFullYear() === today.getFullYear();
+                    default:
+                        return true;
+                }
+            }).sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+
+        function deleteExpense(id) {
+            if (confirm('¿Está seguro de eliminar este gasto?')) {
+                expenses = expenses.filter(e => e.id !== id);
+                saveDataToStorage(); // Guardar en localStorage
+                updateExpensesList();
+                updateDashboard();
+                updateReports();
+            }
+        }
+
+        function viewReceipt(receiptId) {
+            if (receipts[receiptId]) {
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0,0,0,0.8); z-index: 1000;
+                    display: flex; align-items: center; justify-content: center;
+                    flex-direction: column;
+                `;
+                
+                const img = document.createElement('img');
+                img.src = receipts[receiptId];
+                img.style.cssText = 'max-width: 90%; max-height: 80%; border-radius: 10px;';
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.textContent = '❌ Cerrar';
+                closeBtn.className = 'btn btn-danger';
+                closeBtn.style.marginTop = '20px';
+                closeBtn.onclick = () => document.body.removeChild(modal);
+                
+                modal.appendChild(img);
+                modal.appendChild(closeBtn);
+                document.body.appendChild(modal);
+            }
+        }
+
+        // Dashboard
+        function updateDashboard() {
+            if (currentUser.type === 'driver') {
+                updateDriverDashboard();
+            } else {
+                updateAdminDashboard();
+            }
+        }
+
+        function updateAdminDashboard() {
+            document.getElementById('totalVehicles').textContent = vehicles.length;
+            document.getElementById('totalDrivers').textContent = drivers.length;
+            
+            const thisMonth = new Date();
+            const monthlyExpenses = expenses.filter(e => {
+                const expenseDate = new Date(e.date);
+                return expenseDate.getMonth() === thisMonth.getMonth() && 
+                       expenseDate.getFullYear() === thisMonth.getFullYear();
+            });
+            
+            const totalMonth = monthlyExpenses.reduce((sum, e) => sum + e.amount, 0);
+            document.getElementById('totalExpenses').textContent = '$' + totalMonth.toLocaleString();
+            
+            const totalReceipts = expenses.filter(e => e.receiptId).length;
+            document.getElementById('totalReceipts').textContent = totalReceipts;
+            
+            updateRecentExpenses();
+            updateVehicleSummary();
+        }
+
+        function updateDriverDashboard() {
+            // Para conductores, mostrar solo sus estadísticas
+            const driverExpenses = expenses.filter(e => e.driverId === currentUser.driverId);
+            const driverVehicle = vehicles.find(v => v.id === drivers.find(d => d.id === currentUser.driverId)?.vehicleId);
+            
+            // Modificar las tarjetas de estadísticas
+            document.getElementById('totalVehicles').textContent = driverVehicle ? '1' : '0';
+            document.querySelector('#totalVehicles').parentElement.querySelector('div:last-child').textContent = 'Mi Vehículo';
+            
+            document.getElementById('totalDrivers').textContent = '1';
+            document.querySelector('#totalDrivers').parentElement.querySelector('div:last-child').textContent = 'Mi Perfil';
+            
+            const thisMonth = new Date();
+            const monthlyExpenses = driverExpenses.filter(e => {
+                const expenseDate = new Date(e.date);
+                return expenseDate.getMonth() === thisMonth.getMonth() && 
+                       expenseDate.getFullYear() === thisMonth.getFullYear();
+            });
+            
+            const totalMonth = monthlyExpenses.reduce((sum, e) => sum + e.amount, 0);
+            document.getElementById('totalExpenses').textContent = '$' + totalMonth.toLocaleString();
+            
+            const totalReceipts = driverExpenses.filter(e => e.receiptId).length;
+            document.getElementById('totalReceipts').textContent = totalReceipts;
+            
+            updateDriverRecentExpenses();
+            updateDriverVehicleSummary();
+        }
+
+        function updateRecentExpenses() {
+            const recent = expenses.slice(-5).reverse();
+            const container = document.getElementById('recentExpenses');
+            
+            container.innerHTML = recent.map(expense => {
+                const driver = drivers.find(d => d.id === expense.driverId);
+                return `
+                    <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
+                        <strong>$${expense.amount.toLocaleString()}</strong> - ${expense.type}
+                        <br><small>${driver?.name || 'N/A'} - ${expense.date}</small>
+                    </div>
+                `;
+            }).join('') || '<p>No hay gastos registrados</p>';
+        }
+
+        function updateDriverRecentExpenses() {
+            const driverExpenses = expenses.filter(e => e.driverId === currentUser.driverId);
+            const recent = driverExpenses.slice(-5).reverse();
+            const container = document.getElementById('recentExpenses');
+            
+            container.innerHTML = recent.map(expense => {
+                return `
+                    <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
+                        <strong>$${expense.amount.toLocaleString()}</strong> - ${expense.type}
+                        <br><small>${expense.description} - ${expense.date}</small>
+                    </div>
+                `;
+            }).join('') || '<p>No tienes gastos registrados</p>';
+        }
+
+        function updateVehicleSummary() {
+            const container = document.getElementById('vehicleSummary');
+            
+            const summary = vehicles.map(vehicle => {
+                const vehicleExpenses = expenses.filter(e => e.vehicleId === vehicle.id);
+                const total = vehicleExpenses.reduce((sum, e) => sum + e.amount, 0);
+                
+                return {
+                    vehicle,
+                    total,
+                    count: vehicleExpenses.length
+                };
+            });
+            
+            container.innerHTML = summary.map(item => `
+                <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
+                    <strong>${item.vehicle.plate}</strong>
+                    <br>$${item.total.toLocaleString()} (${item.count} gastos)
+                </div>
+            `).join('') || '<p>No hay vehículos registrados</p>';
+        }
+
+        function updateDriverVehicleSummary() {
+            const container = document.getElementById('vehicleSummary');
+            
+            const driver = drivers.find(d => d.id === currentUser.driverId);
+            const vehicle = vehicles.find(v => v.id === driver?.vehicleId);
+            
+            if (vehicle) {
+                const vehicleExpenses = expenses.filter(e => e.vehicleId === vehicle.id && e.driverId === currentUser.driverId);
+                const total = vehicleExpenses.reduce((sum, e) => sum + e.amount, 0);
+                
+                container.innerHTML = `
+                    <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
+                        <strong>${vehicle.plate} - ${vehicle.brand} ${vehicle.model}</strong>
+                        <br>$${total.toLocaleString()} (${vehicleExpenses.length} gastos)
+                        <br><small>Año: ${vehicle.year}</small>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = '<p>No tienes vehículo asignado</p>';
+            }
+        }
+
+        // Reportes
+        function updateReports() {
+            updateVehicleReport();
+            updateDriverReport();
+            updateCategoryReport();
+        }
+
+        function updateVehicleReport() {
+            const container = document.getElementById('vehicleReport');
+            
+            const report = vehicles.map(vehicle => {
+                const vehicleExpenses = expenses.filter(e => e.vehicleId === vehicle.id);
+                const total = vehicleExpenses.reduce((sum, e) => sum + e.amount, 0);
+                
+                return { vehicle, total, expenses: vehicleExpenses.length };
+            }).sort((a, b) => b.total - a.total);
+            
+            container.innerHTML = report.map(item => `
+                <div class="expense-item">
+                    <strong>${item.vehicle.plate} - ${item.vehicle.brand}</strong>
+                    <p>Total: $${item.total.toLocaleString()}</p>
+                    <p>Gastos: ${item.expenses}</p>
+                </div>
+            `).join('') || '<p>No hay datos para mostrar</p>';
+        }
+
+        function updateDriverReport() {
+            const container = document.getElementById('driverReport');
+            
+            const report = drivers.map(driver => {
+                const driverExpenses = expenses.filter(e => e.driverId === driver.id);
+                const total = driverExpenses.reduce((sum, e) => sum + e.amount, 0);
+                
+                return { driver, total, expenses: driverExpenses.length };
+            }).sort((a, b) => b.total - a.total);
+            
+            container.innerHTML = report.map(item => `
+                <div class="expense-item">
+                    <strong>${item.driver.name}</strong>
+                    <p>Total: $${item.total.toLocaleString()}</p>
+                    <p>Gastos: ${item.expenses}</p>
+                </div>
+            `).join('') || '<p>No hay datos para mostrar</p>';
+        }
+
+        function updateCategoryReport() {
+            const container = document.getElementById('categoryReport');
+            
+            const categories = {};
+            expenses.forEach(expense => {
+                if (!categories[expense.type]) {
+                    categories[expense.type] = { total: 0, count: 0 };
+                }
+                categories[expense.type].total += expense.amount;
+                categories[expense.type].count += 1;
+            });
+            
+            const report = Object.entries(categories).map(([type, data]) => ({
+                type, ...data
+            })).sort((a, b) => b.total - a.total);
+            
+            container.innerHTML = report.map(item => `
+                <div class="expense-item">
+                    <strong>${item.type.toUpperCase()}</strong>
+                    <p>Total: $${item.total.toLocaleString()}</p>
+                    <p>Gastos: ${item.count}</p>
+                </div>
+            `).join('') || '<p>No hay datos para mostrar</p>';
+        }
+
+        function updateAllLists() {
+            updateVehiclesList();
+            updateDriversList();
+            updateExpensesList();
+            updateVehicleSelects();
+            updateDriverSelects();
+            updateReports();
+        }
+
+        // Exportar/Importar datos
+        function exportData() {
+            const data = {
+                vehicles,
+                drivers,
+                expenses,
+                receipts,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `gastos_vehiculos_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData() {
+            document.getElementById('importFile').click();
+        }
+
+        function handleImport(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        
+                        if (confirm('¿Está seguro de importar estos datos? Se reemplazarán los datos actuales.')) {
+                            vehicles = data.vehicles || [];
+                            drivers = data.drivers || [];
+                            expenses = data.expenses || [];
+                            receipts = data.receipts || {};
+                            
+                            saveDataToStorage(); // Guardar datos importados
+                            updateDashboard();
+                            updateAllLists();
+                            alert('Datos importados exitosamente');
+                        }
+                    } catch (error) {
+                        alert('Error al importar los datos: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+    </script>
+</body>
+</html>
